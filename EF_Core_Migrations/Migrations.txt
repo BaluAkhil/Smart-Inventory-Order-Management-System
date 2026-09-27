@@ -1,0 +1,185 @@
+Database Migrations — OrderManagementSystem
+
+This document explains the EF Core migrations used in the OrderManagementSystem project and the files available in the `Migrations` folder.
+
+=> How EF Core Migrations Work
+
+EF Core migrations are used to keep the database structure in sync with the application models.
+
+Each migration contains two main methods:
+
+==> Up() — applies the database changes, such as creating tables or adding columns.
+==> Down() — reverses the changes made by "Up()".
+
+When a migration is created using:
+
+==> Add migrations add MigrationName
+
+
+EF Core also generates a ".Designer.cs" file. 
+This file contains the model information used by EF Core when comparing the current model with previous migrations.
+
+The project also contains an "AppDbContextModelSnapshot.cs" file.
+This file represents the latest state of the application's EF Core model and is updated whenever a new migration is created.
+
+In simple terms:
+
+==> Up() / Down() → Apply or reverse database changes
+==> "Designer.cs" → Stores the model information for that migration
+==> "AppDbContextModelSnapshot.cs" → Stores the latest overall model state
+
+---
+
+1. InitialCreate.cs
+
+`InitialCreate.cs` is the first migration in the project. It creates the initial database structure.
+
+The migration creates the following tables:
+
+=> Products
+
+Contains:
+
+-> Id
+-> Name
+->Description
+-> Sku
+-> Category
+-> Price
+-> Quantity
+-> IsActive
+-> CreatedAt
+-> UpdatedAt
+
+### Users
+
+Contains:
+
+-> Id
+-> FullName
+-> Email
+-> PasswordHash
+-> Role
+
+=> Carts
+
+Contains:
+
+-> Id
+-> UserId
+-> CreatedAt
+
+"UserId" is a foreign key to the 'Users' table.
+
+=> Orders
+
+Contains:
+
+-> Id
+-> UserId
+-> OrderDate
+-> Status
+-> TotalAmount
+
+=> CartItems
+
+Contains:
+
+-> Id
+-> CartId
+-> ProductId
+-> Quantity
+
+=> OrderItems
+
+Contains:
+
+-> Id
+-> OrderId
+-> ProductId
+-> Quantity
+-> UnitPrice
+
+=> Important Database Relationships
+
+The migration creates foreign-key relationships between the tables.
+
+Cascade delete is configured for the related records. For example, deleting a cart also removes its cart items, and deleting an order removes its order items.
+
+The "Carts.UserId" column has a unique index. This ensures that a user can have only one cart.
+
+The "Down()" method removes the tables in reverse dependency order so that the foreign-key relationships do not cause problems during rollback.
+
+---
+
+2. AppDbContextModelSnapshot.cs
+
+"AppDbContextModelSnapshot.cs" represents the current EF Core model after the migrations have been applied.
+
+The current model includes two fields that were added after the initial migration:
+
+=> Product.RowVersion
+
+ "RowVersion" is a SQL Server "rowversion" column used for optimistic concurrency.
+
+It allows EF Core to detect when a product has been changed by another operation before the current operation saves its changes.
+
+If the row has changed, EF Core can throw a `DbUpdateConcurrencyException`.
+
+=> OrderItem.ProductName
+
+ "ProductName" stores the product name directly in the order item.
+
+This means the order keeps the product name that was used when the order was created instead of depending only on the current product record.
+
+The snapshot file is generated and maintained by EF Core. It should normally not be edited manually.
+
+
+
+3. SecondModification.cs
+
+  "SecondModification.cs" adds the two fields that were not present in the initial database migration:
+
+==> Products.RowVersion
+==> OrderItems.ProductName
+
+=> Up()
+
+The migration:
+
+==> Adds RowVersion to the Products table.
+==> Adds ProductName to the OrderItems table.
+
+=> Down()
+
+The migration removes:
+
+==> OrderItems.ProductName
+==> Products.RowVersion
+
+The columns are removed in reverse order.
+
+=> SecondModification.Designer.cs
+
+EF Core also generates a .Designer.cs file for this migration.
+
+It contains the model information used by EF Core for this migration. Since `SecondModification` is currently the latest migration, its model information corresponds to the current model represented by `AppDbContextModelSnapshot.cs`.
+
+
+=> Migration Commands(Manager Console)
+
+To create a new migration
+
+--> Add-Migration
+
+To apply the migrations to the database:
+
+--> Update-Database
+
+To list the migrations:
+
+--> List-Migrations
+
+
+
+
