@@ -63,7 +63,7 @@ public class AuthService(
 
         return new AuthResponseDto
         {
-            UserId = user.Id,
+            UserId = user.UserId,
             FullName = user.FullName,
             Email = user.Email,
             Role = user.Role,

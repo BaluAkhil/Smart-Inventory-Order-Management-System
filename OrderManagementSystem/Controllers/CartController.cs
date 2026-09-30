@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OrderManagementSystem.DTOs;
-using OrderManagementSystem.Models;
 using OrderManagementSystem.Services;
 using System.Security.Claims;
 

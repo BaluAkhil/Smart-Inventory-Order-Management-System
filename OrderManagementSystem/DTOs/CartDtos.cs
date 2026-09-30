@@ -5,15 +5,15 @@ namespace OrderManagementSystem.DTOs
 {
     public class CartDtos
     {
-        public int Id { get; set; }
-        public List<CartItemDto> Item { get; set; } = new();
+        public int CartId { get; set; }
+        public List<CartItemDto> Items { get; set; } = new();
 
-        public decimal TotalAmount => Item.Sum(a => a.Total);
+        public decimal TotalAmount => Items.Sum(a => a.Total);
     }
 
     public class CartItemDto
     {
-        public int Id { get; set; }
+        public int CartItemId { get; set; }
         public int ProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
         public decimal UnitPrice { get; set; }

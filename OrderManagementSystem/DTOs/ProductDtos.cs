@@ -4,8 +4,8 @@ namespace OrderManagementSystem.DTOs
 {
     public class ProductDtos
     {
-        public int Id { get; set; }
-        public string Name { get; set; } = "";
+        public int ProductId { get; set; }
+        public string ProductName { get; set; } = "";
         public string? Description { get; set; }
         public string Sku { get; set; } = "";
         public string? Category { get; set; }
@@ -19,7 +19,7 @@ namespace OrderManagementSystem.DTOs
     public class CreateProductDto
     {
         [Required, StringLength(200, MinimumLength =2)]
-        public string Name { get; set; } = "";
+        public string ProductName { get; set; } = "";
 
         [StringLength(1000)]
         public string? Description { get; set; }
@@ -41,7 +41,7 @@ namespace OrderManagementSystem.DTOs
     public class UpdateProductDto
     {
         [Required, StringLength(150, MinimumLength = 2)]
-        public string Name { get; set; } = "";
+        public string ProductName { get; set; } = "";
 
         [StringLength(1000)]
         public string? Description { get; set; }

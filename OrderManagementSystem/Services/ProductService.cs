@@ -8,17 +8,13 @@ namespace OrderManagementSystem.Services
 {
     public interface IProductService
     {
-        Task<PagedResult<ProductDtos>> GetProductsAsync(
-            ProductQueryParams query, bool includeInactive);
+        Task<PagedResult<ProductDtos>> GetProductsAsync(ProductQueryParams query, bool includeInactive);
 
-        Task<ProductDtos> GetByIdAsync(
-            int id, bool includeInactive);
+        Task<ProductDtos> GetByIdAsync(int id, bool includeInactive);
 
-        Task<ProductDtos> CreateAsync(
-            CreateProductDto dto);
+        Task<ProductDtos> CreateAsync(CreateProductDto dto);
 
-        Task<ProductDtos> UpdateAsync(
-            int id, UpdateProductDto dto);
+        Task<ProductDtos> UpdateAsync(int id, UpdateProductDto dto);
 
         Task DeleteAsync(int id);
     }
@@ -27,13 +23,9 @@ namespace OrderManagementSystem.Services
     {
         private readonly AppDbContext _context;
 
-        public ProductService(AppDbContext context)
-        {
-            _context = context;
-        }
+        public ProductService(AppDbContext context) => _context = context;
 
-        public async Task<PagedResult<ProductDtos>> GetProductsAsync(
-            ProductQueryParams query, bool includeInactive)
+        public async Task<PagedResult<ProductDtos>> GetProductsAsync(ProductQueryParams query, bool includeInactive)
         {
             var products = _context.Products.AsNoTracking();
 
@@ -45,10 +37,9 @@ namespace OrderManagementSystem.Services
                 string search = query.Search.Trim().ToLower();
 
                 products = products.Where(p =>
-                    p.Name.ToLower().Contains(search) ||
+                    p.ProductName.ToLower().Contains(search) ||
                     p.Sku.ToLower().Contains(search) ||
-                    (p.Category != null &&
-                     p.Category.ToLower().Contains(search)));
+                    (p.Category != null && p.Category.ToLower().Contains(search)));
             }
 
             if (!string.IsNullOrWhiteSpace(query.Category))
@@ -69,7 +60,7 @@ namespace OrderManagementSystem.Services
                 : query.PageSize;
 
             var productList = await products
-                .OrderBy(p => p.Name)
+                .OrderBy(p => p.ProductName)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -83,13 +74,11 @@ namespace OrderManagementSystem.Services
             };
         }
 
-        public async Task<ProductDtos> GetByIdAsync(
-            int id, bool includeInactive)
+        public async Task<ProductDtos> GetByIdAsync(int id, bool includeInactive)
         {
             var product = await _context.Products.FindAsync(id);
 
-            if (product == null ||
-                (!includeInactive && !product.IsActive))
+            if (product == null ||(!includeInactive && !product.IsActive))
             {
                 throw new NotFoundException("Product not found.");
             }
@@ -106,7 +95,7 @@ namespace OrderManagementSystem.Services
 
             var product = new Product
             {
-                Name = dto.Name.Trim(),
+                ProductName = dto.ProductName,
                 Description = dto.Description?.Trim(),
                 Sku = sku,
                 Category = dto.Category?.Trim(),
@@ -121,15 +110,14 @@ namespace OrderManagementSystem.Services
             return ToDto(product);
         }
 
-        public async Task<ProductDtos> UpdateAsync(
-            int id, UpdateProductDto dto)
+        public async Task<ProductDtos> UpdateAsync(int id, UpdateProductDto dto)
         {
             var product = await _context.Products.FindAsync(id);
 
             if (product == null)
                 throw new NotFoundException("Product not found.");
 
-            product.Name = dto.Name.Trim();
+            product.ProductName = dto.ProductName.Trim();
             product.Description = dto.Description?.Trim();
             product.Category = dto.Category?.Trim();
             product.Price = dto.Price;
@@ -159,8 +147,8 @@ namespace OrderManagementSystem.Services
         {
             return new ProductDtos
             {
-                Id = product.Id,
-                Name = product.Name,
+                ProductId = product.ProductId,
+                ProductName = product.ProductName,
                 Description = product.Description,
                 Sku = product.Sku,
                 Category = product.Category,

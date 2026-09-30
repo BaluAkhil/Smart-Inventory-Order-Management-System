@@ -82,21 +82,21 @@ namespace OrderManagementSystem.Services
                     if (!product.IsActive)
                     {
                         throw new BadRequestException(
-                            $"Product '{product.Name}' is not available.");
+                            $"Product '{product.ProductName}' is not available.");
                     }
 
                     if (product.Quantity < item.Quantity)
                     {
                         throw new BadRequestException(
-                            $"Insufficient stock for '{product.Name}'.");
+                            $"Insufficient stock for '{product.ProductName}'.");
                     }
 
                     product.Quantity -= item.Quantity;
 
                     var orderItem = new OrderItem
                     {
-                        ProductId = product.Id,
-                        ProductName = product.Name,
+                        ProductId = product.ProductId,
+                        ProductName = product.ProductName,
                         Quantity = item.Quantity,
                         UnitPrice = product.Price
                     };
@@ -153,7 +153,7 @@ namespace OrderManagementSystem.Services
             var order = await _context.Orders
                 .AsNoTracking()
                 .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
             if (order == null)
             {
@@ -199,7 +199,7 @@ namespace OrderManagementSystem.Services
         {
             var order = await _context.Orders
                 .Include(o => o.Items)
-                .FirstOrDefaultAsync(o => o.Id == orderId);
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
 
             if (order == null)
             {
@@ -221,10 +221,7 @@ namespace OrderManagementSystem.Services
         }
 
         // Pagination
-        private async Task<PagedResult<OrderDtos>> GetOrders(
-            IQueryable<Order> query,
-            int page,
-            int pageSize)
+        private async Task<PagedResult<OrderDtos>> GetOrders(IQueryable<Order> query,int page,int pageSize)
         {
             int totalCount = await query.CountAsync();
 
@@ -244,18 +241,19 @@ namespace OrderManagementSystem.Services
             };
         }
 
-        // Convert Order to DTO
+        // Convert Order to DTO 
         private OrderDtos ToDto(Order order)
         {
             return new OrderDtos
             {
-                Id = order.Id,
+                OrderId = order.OrderId,
                 OrderDate = order.OrderDate,
                 Status = order.Status,
                 TotalAmount = order.TotalAmount,
 
                 Items = order.Items.Select(i => new OrderItemDto
                 {
+                    OrderItemId = i.OrderItemId,
                     ProductId = i.ProductId,
                     ProductName = i.ProductName,
                     Quantity = i.Quantity,

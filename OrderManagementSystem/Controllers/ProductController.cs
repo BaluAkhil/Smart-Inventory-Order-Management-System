@@ -21,8 +21,7 @@ namespace OrderManagementSystem.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<ActionResult<PagedResult<ProductDtos>>> GetAll(
-            [FromQuery] ProductQueryParams query)
+        public async Task<ActionResult<PagedResult<ProductDtos>>> GetAll([FromQuery] ProductQueryParams query)
         {
             var result = await _productService.GetProductsAsync(query, false);
 
@@ -40,12 +39,11 @@ namespace OrderManagementSystem.Controllers
 
         [HttpPost]
         [Authorize(Roles = UserRoles.Admin)]
-        public async Task<ActionResult<ProductDtos>> Create(
-            CreateProductDto dto)
+        public async Task<ActionResult<ProductDtos>> Create(CreateProductDto dto)
         {
             var result = await _productService.CreateAsync(dto);
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.ProductId }, result);
         }
 
         [HttpPut("{id:int}")]

@@ -5,16 +5,17 @@ namespace OrderManagementSystem.DTOs
 {
     public class OrderDtos
     {
-        public int Id { get; set; }
+        public int OrderId { get; set; }
         public DateTime OrderDate { get; set; }
         public OrderStatus Status { get; set; }
         public decimal TotalAmount { get; set; }
 
-        public List<OrderItemDto> Items { get; set; } = new List<OrderItemDto>();
+        public List<OrderItemDto> Items { get; set; } = new();
     }
 
     public class OrderItemDto
     {
+        public int OrderItemId { get; set; }
         public int ProductId { get; set; }
         public string ProductName { get; set; } = "";
         public int Quantity { get; set; }

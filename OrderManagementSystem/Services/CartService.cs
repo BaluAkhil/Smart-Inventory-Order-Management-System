@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿ using Microsoft.EntityFrameworkCore;
 using OrderManagementSystem.Data;
 using OrderManagementSystem.DTOs;
 using OrderManagementSystem.Exceptions;
@@ -18,10 +18,7 @@ namespace OrderManagementSystem.Services
     {
         private readonly AppDbContext _context;
 
-        public CartService(AppDbContext context)
-        {
-            _context = context;
-        }
+        public CartService(AppDbContext context) => _context = context;
 
         public async Task<CartDtos> GetCartAsync(int userId)
         {
@@ -33,8 +30,7 @@ namespace OrderManagementSystem.Services
         {
             var cart = await GetCart(userId);
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(p => p.Id == dto.ProductId);
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == dto.ProductId);
 
             if (product == null)
                 throw new NotFoundException("Product not found.");
@@ -42,8 +38,7 @@ namespace OrderManagementSystem.Services
             if (!product.IsActive)
                 throw new BadRequestException("Product is not available.");
 
-            var item = cart.Items
-                .FirstOrDefault(i => i.ProductId == dto.ProductId);
+            var item = cart.Items.FirstOrDefault(i => i.ProductId == dto.ProductId);
 
             int quantity = (item?.Quantity ?? 0) + dto.Quantity;
 
@@ -58,8 +53,8 @@ namespace OrderManagementSystem.Services
             {
                 cart.Items.Add(new CartItem
                 {
-                    CartId = cart.Id,
-                    ProductId = product.Id,
+                    CartId = cart.CartId,
+                    ProductId = product.ProductId,
                     Quantity = dto.Quantity
                 });
             }
@@ -69,13 +64,11 @@ namespace OrderManagementSystem.Services
             return ToDto(cart);
         }
 
-        public async Task<CartDtos> UpdateItemAsync(
-            int userId, int cartItemId, UpdateCartItemDto dto)
+        public async Task<CartDtos> UpdateItemAsync(int userId, int cartItemId, UpdateCartItemDto dto)
         {
             var cart = await GetCart(userId);
 
-            var item = cart.Items
-                .FirstOrDefault(i => i.Id == cartItemId);
+            var item = cart.Items.FirstOrDefault(i => i.CartItemId == cartItemId);
 
             if (item == null)
                 throw new NotFoundException("Cart item not found.");
@@ -94,8 +87,7 @@ namespace OrderManagementSystem.Services
         {
             var cart = await GetCart(userId);
 
-            var item = cart.Items
-                .FirstOrDefault(i => i.Id == cartItemId);
+            var item = cart.Items.FirstOrDefault(i => i.CartItemId == cartItemId);
 
             if (item == null)
                 throw new NotFoundException("Cart item not found.");
@@ -133,12 +125,12 @@ namespace OrderManagementSystem.Services
         {
             return new CartDtos
             {
-                Id = cart.Id,
-                Item = cart.Items.Select(i => new CartItemDto
+                CartId = cart.CartId,
+                Items = cart.Items.Select(i => new CartItemDto
                 {
-                    Id = i.Id,
+                    CartItemId = i.CartItemId,
                     ProductId = i.ProductId,
-                    ProductName = i.Product.Name,
+                    ProductName = i.Product.ProductName,
                     UnitPrice = i.Product.Price,
                     Quantity = i.Quantity,
                     AvailableStock = i.Product.Quantity
